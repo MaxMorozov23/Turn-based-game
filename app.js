@@ -63,6 +63,7 @@ new Vue({
         },
         giveUp: function () {
             this.gameIsRunning = false;
+            this.turn = 5;
         },
         monsterAttacks: function() {
             var damage = this.calculateDamage(5, 12);
