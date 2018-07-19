@@ -13,6 +13,7 @@ new Vue({
             this.playerHealth = 100;
             this.monsterHealth = 100;
             this.turns = [];
+            this.turn = 5;
         },
         attack: function () {
             var damage = this.calculateDamage(3, 10);
@@ -24,7 +25,6 @@ new Vue({
             if (this.checkWin()) {
                 return;
             }
-
             this.monsterAttacks();
             this.turnLeft();
         },
@@ -40,7 +40,6 @@ new Vue({
                   return;
               }
               this.monsterAttacks();
-              this.turn = 5;
             } else {
               this.turns.unshift({
                   isPlayer: true,
