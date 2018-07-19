@@ -44,8 +44,7 @@ new Vue({
             } else {
               this.turns.unshift({
                   isPlayer: true,
-
-                  text: 'Super attack charges. ' + 'There are ' + this.turn + ' turns left'
+                  text: 'Super attack charges. There are ' + this.turn + ' turns left'
               });
             }
         },
