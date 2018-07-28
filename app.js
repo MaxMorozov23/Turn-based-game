@@ -36,6 +36,7 @@ new Vue({
                   isPlayer: true,
                   text: 'Player hits Monster hard for ' + damage
               });
+              this.turn = 5;
               if (this.checkWin()) {
                   return;
               }
