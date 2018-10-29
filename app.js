@@ -19,10 +19,11 @@ new Vue({
         currentTurn: 0,
         level: 1,
         enlarger: 0,
-        healCount: 10
+        healCount: 10,
+        healTurn: 0
     },
     methods: {
-        startGame: function () {
+        startGame() {
             this.gameIsRunning = true;
             this.monsterHealthPercent = 100;
             this.playerHealthPercent = 100;
@@ -32,10 +33,11 @@ new Vue({
             this.playerHealthStay = this.playerHealth;
             this.healCount = 10;
             this.turns = [];
-            this.turn = 5;     
+            this.turn = 5;  
+            this.healTurn = 1;   
             this.level = 1;
         },
-        nextLevel: function () {
+        nextLevel() {
             this.gameIsRunning = true;
             this.monsterHealthPercent = 100;
             this.playerHealthPercent = 100;
@@ -45,8 +47,9 @@ new Vue({
             this.playerHealthStay = this.playerHealth;
             this.turns = [];
             this.turn = 5;
+            this.healTurn = 1;   
         },
-        attack: function () {
+        attack() {
             var damage = this.calculateDamage(this.playerMinDamage, this.playerMaxDamage);
             this.monsterHealth -= damage;
             this.monsterHealthPercent = (100 * this.monsterHealth) / this.monsterHealthStay;
@@ -59,11 +62,11 @@ new Vue({
             if (this.checkWin()) {
                 return;
             }
-
             this.monsterAttacks();
             this.turnLeft();
+            this.healTurnLeft();
         },
-        specialAttack: function () {
+        specialAttack() {
             if (this.turn === 0) {
             var damage = this.calculateDamage(this.playerSpecialMinDamage, this.playerSpecialMaxDamage);
             this.monsterHealth -= damage;
@@ -75,6 +78,7 @@ new Vue({
             });
             this.turn = 5;
             this.currentTurn++;
+            this.healTurnLeft();
             if (this.checkWin()) {
                 return;
             }
@@ -87,8 +91,9 @@ new Vue({
             });
           }
         },
-        heal: function () {
-            if (this.playerHealth != 100) {
+        heal() {
+            if (this.healTurn === 0) {            
+                if (this.playerHealth != 100) {
                 if (this.playerHealth <= 90) {
                     this.playerHealth += this.healCount;
                 } else {
@@ -102,25 +107,31 @@ new Vue({
                 this.currentTurn++;
                 this.monsterAttacks();
                 this.turnLeft();
+                this.healTurn = 1;
             } else {
                 this.turns.unshift({
                     isPlayer: false,
                     text: 'You have full health',
                     id: this.currentTurn + 1
                 });
-            }            
+            }   
+        } else {
+            this.turns.unshift({
+                isPlayer: false,
+                text: 'Heal charges. There are ' + this.healTurn + ' turns left',
+                id: this.currentTurn + 1
+            });
+        }         
         },
-        giveUp: function () {
+        giveUp() {
             this.gameIsRunning = false;
             this.turn = 5;
         },
-        monsterAttacks: function() {
-            
+        monsterAttacks() {         
             var damage = this.calculateDamage(this.monsterMinDamage, this.monsterMaxDamage);
             this.playerHealth -= damage;
             this.checkWin();
             this.playerHealthPercent = (100 * this.playerHealth) / this.playerHealthStay;
-            
             this.turns.unshift({
                 isPlayer: false,
                 text: 'Monster hits Player for ' + damage,
@@ -128,10 +139,10 @@ new Vue({
             });
             this.currentTurn++;
         },
-        calculateDamage: function(min, max) {
+        calculateDamage(min, max) {
             return Math.max(Math.floor(Math.random() * max) + 1, min);
         },
-        checkWin: function() {
+        checkWin() {
             if (this.monsterHealth <= 0) {
                 if (confirm('Next level?')) {
                     this.level++;
@@ -148,12 +159,11 @@ new Vue({
                     this.gameIsRunning = false;
                 }
                 return true;
-
             } else if (this.playerHealth <= 0) {
                 if (confirm('You lost! New Game?' + "\r\n" + 'Your level: ' + this.level)) {  
                                      setTimeout(() => {
                                         this.startGame();   
-                                     }, 1);      // without doesn't work       
+                                     }, 1);// without doesn't work       
                 } else {
                     this.gameIsRunning = false;
                 }
@@ -161,9 +171,14 @@ new Vue({
             }
             return false;
         },
-        turnLeft: function() {
+        turnLeft() {
             if (this.turn >= 1) {
               this.turn--;
+            }
+          },
+          healTurnLeft() {
+            if (this.healTurn >= 1) {
+              this.healTurn--;
             }
           }
     }
